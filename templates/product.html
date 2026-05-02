@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — Flashee{% endblock %}
+
+{% block content %}
+<div class="container product-page">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="{{ url_for('index') }}">Home</a>
+    <span>›</span>
+    <a href="{{ url_for('category', category_id=product.category) }}">{{ product.category_label }}</a>
+    <span>›</span>
+    <span>{{ product.name }}</span>
+  </nav>
+
+  <!-- ===== PRODUCT DETAIL SECTION ===== -->
+  <div class="product-detail">
+
+    <!-- Product Image -->
+    <div class="product-detail-img-wrap">
+      <img src="{{ product.image }}" alt="{{ product.name }}" class="product-detail-img" />
+      {% if product.badge %}
+        <span class="product-badge badge-{{ product.badge | lower | replace(' ', '-') }} detail-badge">
+          {{ product.badge }}
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- Product Info & Add to Cart Form -->
+    <div class="product-detail-info">
+      <span class="product-category">{{ product.category_label }}</span>
+      <h1 class="product-detail-name">{{ product.name }}</h1>
+
+      <!-- Rating -->
+      <div class="product-rating detail-rating">
+        {% for i in range(5) %}
+          <span class="star {% if i < product.rating | int %}filled{% endif %}">★</span>
+        {% endfor %}
+        <span class="review-count">{{ product.rating }} / 5 ({{ product.reviews }} reviews)</span>
+      </div>
+
+      <!-- Price -->
+      <div class="product-detail-price">₱{{ product.price }}</div>
+
+      <!-- Description -->
+      <p class="product-detail-desc">{{ product.description }}</p>
+
+      <!-- Add to Cart Form -->
+      <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="add-to-cart-form">
+
+        <!-- Size Selector -->
+        <div class="form-group">
+          <label class="form-label">Size</label>
+          <div class="size-options">
+            {% for size in product.sizes %}
+            <label class="size-label">
+              <input type="radio" name="size" value="{{ size }}" {% if size == 'Medium' %}checked{% endif %} />
+              <span class="size-pill">{{ size }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <div class="qty-control">
+            <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input type="number" name="quantity" id="qty-input" value="1" min="1" max="99" class="qty-input" />
+            <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary full-width">🛒 Add to Cart</button>
+      </form>
+
+      <!-- Info Pills -->
+      <div class="product-meta-pills">
+        <span class="meta-pill">🚚 Fast Delivery</span>
+        <span class="meta-pill">🔒 Secure Checkout</span>
+        <span class="meta-pill">↩️ Easy Returns</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CUSTOMER REVIEWS ===== -->
+  <section class="reviews-section">
+    <h2 class="section-title">Customer Reviews</h2>
+    <div class="reviews-grid">
+      {% for review in reviews %}
+      <div class="review-card">
+        <div class="review-header">
+          <span class="review-author">{{ review.author }}</span>
+          <div class="review-stars">
+            {% for i in range(5) %}
+              <span class="star {% if i < review.rating %}filled{% endif %}">★</span>
+            {% endfor %}
+          </div>
+        </div>
+        <p class="review-comment">{{ review.comment }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

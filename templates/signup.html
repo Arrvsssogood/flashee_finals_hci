@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — Flashee{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <h1 class="auth-title">Create an Account 🛒</h1>
+    <p class="auth-sub">Join Flashee and get exclusive deals on party supplies!</p>
+
+    <!-- Google Signup (UI only) -->
+    <button class="google-btn" onclick="alert('Google signup is not connected in this demo.')">
+      <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" width="20" />
+      Sign Up with Google
+    </button>
+
+    <div class="auth-divider"><span>or</span></div>
+
+    <!-- Registration Form -->
+    <form action="{{ url_for('signup') }}" method="POST" class="auth-form">
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Maria Santos"
+               class="auth-input" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com"
+               class="auth-input" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Create a strong password"
+               class="auth-input" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="confirm">Confirm Password</label>
+        <input type="password" id="confirm" name="confirm" placeholder="Repeat your password"
+               class="auth-input" required />
+      </div>
+      <button type="submit" class="btn-primary full-width">Create Account</button>
+    </form>
+
+    <p class="auth-switch">
+      Already have an account?
+      <a href="{{ url_for('login') }}">Log In</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ current_cat.label if current_cat else 'Category' }} — Flashee{% endblock %}
+
+{% block content %}
+<div class="container category-page">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="{{ url_for('index') }}">Home</a>
+    <span>›</span>
+    <span>{{ current_cat.label if current_cat else 'Category' }}</span>
+  </nav>
+
+  <div class="category-layout">
+
+    <!-- ===== SIDEBAR FILTERS (UI only) ===== -->
+    <aside class="sidebar">
+      <h3 class="sidebar-title">FILTER BY</h3>
+
+      <div class="filter-group">
+        <h4>Price Range</h4>
+        <label><input type="checkbox" checked /> Under ₱50</label>
+        <label><input type="checkbox" checked /> ₱50 – ₱200</label>
+        <label><input type="checkbox" /> ₱200 – ₱500</label>
+        <label><input type="checkbox" /> Over ₱500</label>
+      </div>
+
+      <div class="filter-group">
+        <h4>Category</h4>
+        {% for cat in categories %}
+        <label>
+          <input type="checkbox" {% if current_cat and cat.id == current_cat.id %}checked{% endif %} />
+          {{ cat.label }}
+        </label>
+        {% endfor %}
+      </div>
+
+      <div class="filter-group">
+        <h4>Rating</h4>
+        <label><input type="checkbox" /> ★★★★★ (5 Stars)</label>
+        <label><input type="checkbox" checked /> ★★★★☆ (4+ Stars)</label>
+        <label><input type="checkbox" /> ★★★☆☆ (3+ Stars)</label>
+      </div>
+
+      <div class="filter-group">
+        <h4>Size</h4>
+        <label><input type="checkbox" checked /> Small</label>
+        <label><input type="checkbox" checked /> Medium</label>
+        <label><input type="checkbox" checked /> Large</label>
+      </div>
+
+      <button class="filter-apply-btn">Apply Filters</button>
+      <button class="filter-clear-btn" onclick="clearFilters()">Clear All</button>
+    </aside>
+
+    <!-- ===== PRODUCT LISTING ===== -->
+    <div class="category-main">
+      <div class="category-header">
+        <h2>
+          {% if current_cat %}
+            {{ current_cat.icon }} {{ current_cat.label }}
+          {% else %}
+            All Products
+          {% endif %}
+        </h2>
+        <span class="product-count">{{ products | length }} product(s)</span>
+
+        <select class="sort-select" onchange="sortProducts(this.value)">
+          <option value="default">Sort: Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Best Rated</option>
+        </select>
+      </div>
+
+      {% if products %}
+      <div class="product-grid" id="product-grid">
+        {% for p in products %}
+        <div class="product-card" data-price="{{ p.price }}" data-rating="{{ p.rating }}">
+          {% if p.badge %}
+            <span class="product-badge badge-{{ p.badge | lower | replace(' ', '-') }}">{{ p.badge }}</span>
+          {% endif %}
+          <a href="{{ url_for('product', product_id=p.id) }}">
+            <div class="product-img-wrap">
+              <img src="{{ p.image }}" alt="{{ p.name }}" class="product-img" loading="lazy" />
+            </div>
+          </a>
+          <div class="product-info">
+            <span class="product-category">{{ p.category_label }}</span>
+            <a href="{{ url_for('product', product_id=p.id) }}" class="product-name">{{ p.name }}</a>
+            <div class="product-rating">
+              {% for i in range(5) %}
+                <span class="star {% if i < p.rating | int %}filled{% endif %}">★</span>
+              {% endfor %}
+              <span class="review-count">({{ p.reviews }})</span>
+            </div>
+            <div class="product-footer">
+              <span class="product-price">₱{{ p.price }}</span>
+              <form action="{{ url_for('add_to_cart', product_id=p.id) }}" method="POST">
+                <input type="hidden" name="quantity" value="1" />
+                <input type="hidden" name="size" value="Medium" />
+                <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <p>😕 No products found in this category yet.</p>
+        <a href="{{ url_for('index') }}" class="btn-primary">Browse All Products</a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

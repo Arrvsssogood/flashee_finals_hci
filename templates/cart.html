@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Your Cart — Flashee{% endblock %}
+
+{% block content %}
+<div class="container cart-page">
+  <h1 class="page-title">🛒 Your Cart</h1>
+
+  {% if cart %}
+
+  <!-- ===== CART WITH ITEMS ===== -->
+  <div class="cart-layout">
+
+    <!-- Cart Items List -->
+    <div class="cart-items">
+      {% for key, item in cart.items() %}
+      <div class="cart-item">
+        <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-item-img" />
+        <div class="cart-item-details">
+          <h3 class="cart-item-name">{{ item.name }}</h3>
+          <p class="cart-item-size">Size: {{ item.size }}</p>
+          <p class="cart-item-price">₱{{ item.price }} each</p>
+        </div>
+        <div class="cart-item-actions">
+          <!-- Quantity Update Form -->
+          <form action="{{ url_for('update_cart', product_id=item.id) }}" method="POST" class="qty-form">
+            <div class="qty-control small">
+              <button type="button" class="qty-btn"
+                onclick="adjustQty(this, -1)">−</button>
+              <input type="number" name="quantity" value="{{ item.quantity }}"
+                min="1" max="99" class="qty-input"
+                onchange="this.form.submit()" />
+              <button type="button" class="qty-btn"
+                onclick="adjustQty(this, 1)">+</button>
+            </div>
+          </form>
+          <!-- Line Total -->
+          <span class="cart-item-total">₱{{ item.price * item.quantity }}</span>
+          <!-- Remove Button -->
+          <a href="{{ url_for('remove_from_cart', product_id=item.id) }}"
+             class="remove-btn"
+             onclick="return confirm('Remove {{ item.name }} from cart?')">✕</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Order Summary -->
+    <div class="cart-summary">
+      <h2>Order Summary</h2>
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>₱{{ total }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span>{% if total >= 999 %}FREE 🎉{% else %}₱99{% endif %}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-row total-row">
+        <span>Total</span>
+        <span>₱{{ total + (0 if total >= 999 else 99) }}</span>
+      </div>
+      {% if total < 999 %}
+        <p class="free-ship-hint">Add ₱{{ 999 - total }} more for FREE shipping!</p>
+      {% endif %}
+
+      <!-- Checkout Button with Confirmation -->
+      <form action="{{ url_for('checkout') }}" method="POST"
+            onsubmit="return confirm('Are you sure you want to place your order?')">
+        <button type="submit" class="btn-primary full-width checkout-btn">
+          ✅ Proceed to Checkout
+        </button>
+      </form>
+      <a href="{{ url_for('index') }}" class="continue-shopping">← Continue Shopping</a>
+    </div>
+
+  </div>
+
+  {% else %}
+
+  <!-- ===== EMPTY CART STATE ===== -->
+  <div class="empty-cart">
+    <div class="empty-cart-icon">🛒</div>
+    <h2>Your cart is empty.</h2>
+    <p>Looks like you haven't added anything yet. Let's fix that!</p>
+    <a href="{{ url_for('index') }}" class="btn-primary">Shop Now</a>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}

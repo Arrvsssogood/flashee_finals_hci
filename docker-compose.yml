@@ -1,0 +1,15 @@
+# docker-compose.yml — Flashee single-service setup
+
+version: "3.9"
+
+services:
+  flashee:
+    build: .
+    container_name: flashee_app
+    ports:
+      - "5000:5000"   # Access the site at http://localhost:5000
+    environment:
+      - FLASK_ENV=development
+    volumes:
+      - .:/app        # Mount source for live edits (optional for dev)
+    restart: unless-stopped

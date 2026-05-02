@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Flashee — Party Favors & LED Lights{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="top-bar">
+    <span>🎉 FREE SHIPPING on orders over ₱999 | USE CODE: <strong>FLASHPARTY</strong></span>
+  </div>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <div class="navbar-inner">
+
+      <!-- Logo -->
+      <a href="{{ url_for('index') }}" class="logo">Flashee<span class="logo-dot">.com</span></a>
+
+      <!-- Search Bar -->
+      <form action="{{ url_for('search') }}" method="GET" class="search-form">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          name="q"
+          placeholder="Search for party favors"
+          value="{{ search_query if search_query else '' }}"
+          class="search-input"
+        />
+        <button type="submit" class="search-btn">Search</button>
+      </form>
+
+      <!-- Right Icons -->
+      <div class="nav-icons">
+        {% if session.get('user') %}
+          <a href="{{ url_for('logout') }}" class="nav-icon-btn" title="Log Out">👤 Logout</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="nav-icon-btn" title="Account">👤 Account</a>
+        {% endif %}
+        <a href="{{ url_for('cart') }}" class="nav-icon-btn cart-btn" title="Cart">
+          🛒 Cart
+          {% if cart_count > 0 %}
+            <span class="cart-badge">{{ cart_count }}</span>
+          {% endif %}
+        </a>
+        <a href="#" class="bulk-btn">BULK ORDER</a>
+      </div>
+
+    </div>
+
+    <!-- Nav Links -->
+    <nav class="nav-links">
+      <a href="{{ url_for('index') }}">SHOP NEW ARRIVALS</a>
+      <a href="#">EVENT COLLECTIONS</a>
+      <a href="#">EVENTS</a>
+      <a href="{{ url_for('index') }}">PRODUCTS</a>
+      <a href="#">ULTIMATE FUN</a>
+      <a href="#">ABOUT US</a>
+    </nav>
+  </header>
+
+  <!-- ===== FLASH MESSAGES ===== -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            {{ message }}
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ===== PAGE CONTENT ===== -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h3 class="footer-logo">Flashee<span>.com</span></h3>
+        <p>Your go-to shop for party favors, LED lights, and everything that makes celebrations unforgettable.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="{{ url_for('category', category_id='balloons') }}">Balloons</a></li>
+          <li><a href="{{ url_for('category', category_id='led-lights') }}">LED Lights</a></li>
+          <li><a href="{{ url_for('category', category_id='party-hats') }}">Party Hats</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Shipping Info</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Follow Us</h4>
+        <div class="social-links">
+          <a href="#" class="social-btn">Facebook</a>
+          <a href="#" class="social-btn">Instagram</a>
+          <a href="#" class="social-btn">TikTok</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Flashee.com — All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+</body>
+</html>

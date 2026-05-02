@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Flashee — Party Favors, LED Lights & More{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO SECTION ===== -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="flex flex-col items-center text-center">
+    <div class="hero-content">
+        <h1 class="hero-title">LIGHT UP EVERY<br>CELEBRATION</h1>
+        <p class="hero-sub">Party favors, LED lights & fun accessories — delivered fast.</p>
+        <div class="hero-btns">
+          <a href="{{ url_for('index') }}" class="btn-primary">SHOP NEW ARRIVALS</a>
+          <a href="#" class="btn-outline">EVENT COLLECTIONS</a>
+        </div>
+    </div>
+</div>
+  </div>
+</section>
+
+<!-- ===== CATEGORY TILES ===== -->
+<section class="section categories-section">
+  <div class="container">
+    <h2 class="section-title">SHOP BY CATEGORY</h2>
+    <div class="category-grid">
+      {% for cat in categories %}
+      <a href="{{ url_for('category', category_id=cat.id) }}" class="category-card">
+        <div class="category-img" style="background-image: url('{{ cat.image }}');"></div>
+        <div class="category-label">
+          <span class="cat-icon">{{ cat.icon }}</span>
+          {{ cat.label }}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRODUCTS GRID ===== -->
+<section class="section products-section">
+  <div class="container">
+    {% if search_query is defined and search_query %}
+      <h2 class="section-title">Results for "{{ search_query }}"</h2>
+      {% if not products %}
+        <div class="empty-state">
+          <p>😕 No products found for "{{ search_query }}".</p>
+          <a href="{{ url_for('index') }}" class="btn-primary">Back to Shop</a>
+        </div>
+      {% endif %}
+    {% else %}
+      <h2 class="section-title">🔥 FEATURED PRODUCTS</h2>
+    {% endif %}
+
+    <div class="product-grid">
+      {% for p in products %}
+      <div class="product-card">
+        {% if p.badge %}
+          <span class="product-badge badge-{{ p.badge | lower | replace(' ', '-') }}">{{ p.badge }}</span>
+        {% endif %}
+        <a href="{{ url_for('product', product_id=p.id) }}">
+          <div class="product-img-wrap">
+            <img src="{{ p.image }}" alt="{{ p.name }}" class="product-img" loading="lazy" />
+          </div>
+        </a>
+        <div class="product-info">
+          <span class="product-category">{{ p.category_label }}</span>
+          <a href="{{ url_for('product', product_id=p.id) }}" class="product-name">{{ p.name }}</a>
+          <div class="product-rating">
+            {% for i in range(5) %}
+              <span class="star {% if i < p.rating | int %}filled{% endif %}">★</span>
+            {% endfor %}
+            <span class="review-count">({{ p.reviews }})</span>
+          </div>
+          <div class="product-footer">
+            <span class="product-price">₱{{ p.price }}</span>
+            <form action="{{ url_for('add_to_cart', product_id=p.id) }}" method="POST">
+              <input type="hidden" name="quantity" value="1" />
+              <input type="hidden" name="size" value="Medium" />
+              <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROMO BANNER ===== -->
+<section class="promo-banner">
+  <div class="container">
+    <h2>🎊 PLANNING A BULK ORDER?</h2>
+    <p>Get special prices for events, schools, and corporate parties.</p>
+    <a href="#" class="btn-primary">Contact Us for Bulk Pricing</a>
+  </div>
+</section>
+
+{% endblock %}

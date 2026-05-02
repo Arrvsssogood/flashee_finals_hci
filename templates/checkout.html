@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed — Flashee{% endblock %}
+
+{% block content %}
+<div class="container checkout-page">
+  <div class="checkout-card">
+    <div class="checkout-icon">🎉</div>
+    <h1>Thank You for Your Order!</h1>
+    <p class="checkout-msg">
+      Your order has been placed successfully. We'll prepare your party supplies
+      and get them to you as fast as possible!
+    </p>
+    <div class="checkout-details">
+      <p>📦 Estimated delivery: <strong>3–5 business days</strong></p>
+      <p>📧 A confirmation will be sent to your email.</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn-primary">Continue Shopping</a>
+  </div>
+</div>
+{% endblock %}

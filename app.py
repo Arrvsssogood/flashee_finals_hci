@@ -1,0 +1,188 @@
+# app.py - Main Flask application for Flashee
+# A simplified e-commerce site selling party favors
+
+from flask import Flask, render_template, redirect, url_for, session, request, flash
+from products import PRODUCTS, CATEGORIES, get_product_by_id, get_products_by_category
+
+app = Flask(__name__)
+# Secret key needed for Flask sessions (cart storage)
+app.secret_key = "flashee-secret-2024"
+
+
+# ---------------------------------------------------------------------------
+# Helper: get the cart from session, always returns a dict
+# ---------------------------------------------------------------------------
+def get_cart():
+    if "cart" not in session:
+        session["cart"] = {}
+    return session["cart"]
+
+
+def cart_total():
+    """Calculate the total price of all items in the cart."""
+    cart = get_cart()
+    total = 0
+    for product_id, item in cart.items():
+        total += item["price"] * item["quantity"]
+    return total
+
+
+def cart_count():
+    """Return total number of items (sum of quantities) in the cart."""
+    cart = get_cart()
+    return sum(item["quantity"] for item in cart.values())
+
+
+# Make cart_count available in all templates automatically
+@app.context_processor
+def inject_cart_count():
+    return dict(cart_count=cart_count())
+
+
+# ---------------------------------------------------------------------------
+# Routes
+# ---------------------------------------------------------------------------
+
+@app.route("/")
+def index():
+    """Home page — shows categories and all products."""
+    return render_template("index.html", products=PRODUCTS, categories=CATEGORIES)
+
+
+@app.route("/category/<category_id>")
+def category(category_id):
+    """Category page — filtered product grid with a sidebar."""
+    products = get_products_by_category(category_id)
+    # Find the matching category label for the heading
+    current_cat = next((c for c in CATEGORIES if c["id"] == category_id), None)
+    return render_template(
+        "category.html",
+        products=products,
+        categories=CATEGORIES,
+        current_cat=current_cat,
+    )
+
+
+@app.route("/product/<int:product_id>")
+def product(product_id):
+    """Product detail page."""
+    p = get_product_by_id(product_id)
+    if p is None:
+        return redirect(url_for("index"))
+    # Static reviews for the reviews section
+    reviews = [
+        {"author": "Maria S.", "rating": 5, "comment": "Amazing quality! Everyone at the party loved it."},
+        {"author": "Juan D.", "rating": 4, "comment": "Fast delivery, looks exactly like the photo."},
+        {"author": "Anna R.", "rating": 5, "comment": "Will definitely buy again for the next celebration!"},
+    ]
+    return render_template("product.html", product=p, reviews=reviews)
+
+
+@app.route("/add_to_cart/<int:product_id>", methods=["POST"])
+def add_to_cart(product_id):
+    """Add a product to the session cart and redirect back."""
+    p = get_product_by_id(product_id)
+    if p is None:
+        return redirect(url_for("index"))
+
+    quantity = int(request.form.get("quantity", 1))
+    size = request.form.get("size", "Medium")
+
+    cart = get_cart()
+    # Use a string key (session dict keys must be strings)
+    key = str(product_id)
+    if key in cart:
+        cart[key]["quantity"] += quantity
+    else:
+        cart[key] = {
+            "id": p["id"],
+            "name": p["name"],
+            "price": p["price"],
+            "image": p["image"],
+            "size": size,
+            "quantity": quantity,
+        }
+    # Must reassign to mark session as modified
+    session["cart"] = cart
+    flash(f"{p['name']} added to cart!", "success")
+    return redirect(url_for("cart"))
+
+
+@app.route("/remove_from_cart/<int:product_id>")
+def remove_from_cart(product_id):
+    """Remove a product from the cart entirely."""
+    cart = get_cart()
+    key = str(product_id)
+    if key in cart:
+        del cart[key]
+        session["cart"] = cart
+    return redirect(url_for("cart"))
+
+
+@app.route("/update_cart/<int:product_id>", methods=["POST"])
+def update_cart(product_id):
+    """Update quantity of an item in the cart."""
+    cart = get_cart()
+    key = str(product_id)
+    quantity = int(request.form.get("quantity", 1))
+    if key in cart:
+        if quantity <= 0:
+            del cart[key]
+        else:
+            cart[key]["quantity"] = quantity
+    session["cart"] = cart
+    return redirect(url_for("cart"))
+
+
+@app.route("/cart")
+def cart():
+    """Cart page — shows all items, totals, and checkout button."""
+    cart = get_cart()
+    total = cart_total()
+    return render_template("cart.html", cart=cart, total=total)
+
+
+@app.route("/checkout", methods=["POST"])
+def checkout():
+    """Process checkout — clear cart and show thank-you page."""
+    session["cart"] = {}
+    return render_template("checkout.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Simple login page (UI only, no real authentication)."""
+    if request.method == "POST":
+        # Simulate login — always succeeds for demo purposes
+        session["user"] = request.form.get("email", "guest@flashee.com")
+        flash("Welcome back! You're now logged in.", "success")
+        return redirect(url_for("index"))
+    return render_template("login.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    """Simple signup page (UI only, no real registration)."""
+    if request.method == "POST":
+        session["user"] = request.form.get("email", "newuser@flashee.com")
+        flash("Account created! Welcome to Flashee 🎉", "success")
+        return redirect(url_for("index"))
+    return render_template("signup.html")
+
+
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    return redirect(url_for("index"))
+
+
+@app.route("/search")
+def search():
+    """Basic search by product name (case-insensitive)."""
+    query = request.args.get("q", "").lower()
+    results = [p for p in PRODUCTS if query in p["name"].lower()] if query else []
+    return render_template("index.html", products=results, categories=CATEGORIES, search_query=query)
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
