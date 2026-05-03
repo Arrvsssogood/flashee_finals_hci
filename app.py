@@ -36,7 +36,10 @@ def cart_count():
 # Make cart_count available in all templates automatically
 @app.context_processor
 def inject_cart_count():
-    return dict(cart_count=cart_count())
+    return dict(
+        cart_count=cart_count(),
+        user_name=session.get("user_name", None)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -80,7 +83,12 @@ def product(product_id):
 
 @app.route("/add_to_cart/<int:product_id>", methods=["POST"])
 def add_to_cart(product_id):
-    """Add a product to the session cart and redirect back."""
+    """Add a product to the session cart — requires login."""
+    # Block guests from adding to cart
+    if not session.get("user"):
+        flash("Please log in first to add items to your cart. 🔒", "error")
+        return redirect(url_for("login"))
+
     p = get_product_by_id(product_id)
     if p is None:
         return redirect(url_for("index"))
@@ -151,28 +159,39 @@ def checkout():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Simple login page (UI only, no real authentication)."""
+    """Login page — stores name and email in session."""
     if request.method == "POST":
-        # Simulate login — always succeeds for demo purposes
-        session["user"] = request.form.get("email", "guest@flashee.com")
-        flash("Welcome back! You're now logged in.", "success")
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "guest@flashee.com").strip()
+        # Use the name if provided, otherwise use the part before @ in email
+        display_name = name if name else email.split("@")[0].capitalize()
+        session["user"] = email
+        session["user_name"] = display_name
+        flash(f"Welcome back, {display_name}! 🎉", "success")
         return redirect(url_for("index"))
     return render_template("login.html")
 
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    """Simple signup page (UI only, no real registration)."""
+    """Signup page — stores name and email in session."""
     if request.method == "POST":
-        session["user"] = request.form.get("email", "newuser@flashee.com")
-        flash("Account created! Welcome to Flashee 🎉", "success")
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "newuser@flashee.com").strip()
+        display_name = name if name else email.split("@")[0].capitalize()
+        session["user"] = email
+        session["user_name"] = display_name
+        flash(f"Welcome to Flashee, {display_name}! 🎉", "success")
         return redirect(url_for("index"))
     return render_template("signup.html")
 
 
 @app.route("/logout")
 def logout():
+    name = session.get("user_name", "there")
     session.pop("user", None)
+    session.pop("user_name", None)
+    flash(f"See you next time, {name}! 👋", "success")
     return redirect(url_for("index"))
 
 
@@ -183,6 +202,26 @@ def search():
     results = [p for p in PRODUCTS if query in p["name"].lower()] if query else []
     return render_template("index.html", products=results, categories=CATEGORIES, search_query=query)
 
+
+
+@app.route("/events")
+def events():
+    """Events page — themed bundles by occasion."""
+    return render_template("events.html")
+
+
+@app.route("/ultimate-fun")
+def ultimate_fun():
+    """Ultimate Fun page — best sellers and party tips."""
+    # Sort by rating to get the top 4 best sellers
+    top_products = sorted(PRODUCTS, key=lambda p: p["rating"], reverse=True)[:4]
+    return render_template("ultimate_fun.html", top_products=top_products)
+
+
+@app.route("/about")
+def about():
+    """About Us page — brand story and contact form."""
+    return render_template("about.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

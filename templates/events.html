@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Events — Flashee{% endblock %}
+
+{% block content %}
+
+<!-- ===== EVENTS HERO ===== -->
+<section class="page-hero" style="background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1400&q=80');">
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <h1>EVENTS & COLLECTIONS</h1>
+    <p>Shop curated party bundles for every occasion — birthdays, holidays, and more.</p>
+  </div>
+</section>
+
+<!-- ===== EVENT COLLECTIONS GRID ===== -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">SHOP BY OCCASION</h2>
+
+    <div class="events-grid">
+
+      <!-- Birthday -->
+      <div class="event-card">
+        <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=600&q=80');"></div>
+        <div class="event-body">
+          <span class="event-tag">Most Popular</span>
+          <h3>🎂 Birthday Party</h3>
+          <p>Everything you need for the perfect birthday — banners, balloons, hats, and flashing pins.</p>
+          <ul class="event-includes">
+            <li>✓ Happy Birthday Banner</li>
+            <li>✓ Balloon Pack (12 pcs)</li>
+            <li>✓ Crown Headband</li>
+            <li>✓ Confetti Poppers</li>
+          </ul>
+          <a href="{{ url_for('category', category_id='balloons') }}" class="btn-primary">Shop Birthday</a>
+        </div>
+      </div>
+
+      <!-- Holiday -->
+      <div class="event-card">
+        <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=600&q=80');"></div>
+        <div class="event-body">
+          <span class="event-tag">Seasonal</span>
+          <h3>🎄 Holiday Parties</h3>
+          <p>Make your Christmas, New Year's, and holiday gatherings shine with festive party supplies.</p>
+          <ul class="event-includes">
+            <li>✓ LED String Lights</li>
+            <li>✓ Themed Balloons</li>
+            <li>✓ Flashing Pins</li>
+            <li>✓ Party Poppers</li>
+          </ul>
+          <a href="{{ url_for('category', category_id='led-lights') }}" class="btn-primary">Shop Holiday</a>
+        </div>
+      </div>
+
+      <!-- Bachelorette -->
+      <div class="event-card">
+        <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=600&q=80');"></div>
+        <div class="event-body">
+          <span class="event-tag">Fan Favorite</span>
+          <h3>💍 Bachelorette Night</h3>
+          <p>Celebrate the bride-to-be with glam accessories, LED lights, and fun party favors.</p>
+          <ul class="event-includes">
+            <li>✓ Crown Headbands</li>
+            <li>✓ LED Strip Lights</li>
+            <li>✓ Sash & Pins</li>
+            <li>✓ Balloon Garland</li>
+          </ul>
+          <a href="{{ url_for('category', category_id='party-hats') }}" class="btn-primary">Shop Bachelorette</a>
+        </div>
+      </div>
+
+      <!-- Graduation -->
+      <div class="event-card">
+        <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1627556704302-624286467c65?w=600&q=80');"></div>
+        <div class="event-body">
+          <span class="event-tag">New</span>
+          <h3>🎓 Graduation Party</h3>
+          <p>Celebrate your grad in style! Fun decorations and accessories for the big milestone.</p>
+          <ul class="event-includes">
+            <li>✓ Congrats Banner</li>
+            <li>✓ Confetti Poppers</li>
+            <li>✓ Party Hats</li>
+            <li>✓ Balloon Bouquet</li>
+          </ul>
+          <a href="{{ url_for('category', category_id='balloons') }}" class="btn-primary">Shop Graduation</a>
+        </div>
+      </div>
+
+      <!-- New Year -->
+      <div class="event-card">
+        <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=600&q=80');"></div>
+        <div class="event-body">
+          <span class="event-tag">Trending</span>
+          <h3>🥂 New Year's Eve</h3>
+          <p>Ring in the new year with a bang — poppers, LED lights, and everything sparkly.</p>
+          <ul class="event-includes">
+            <li>✓ Confetti Poppers</li>
+            <li>✓ Flashing LED Pins</li>
+            <li>✓ Party Hats</li>
+            <li>✓ Balloon Pack</li>
+          </ul>
+          <a href="{{ url_for('category', category_id='led-lights') }}" class="btn-primary">Shop New Year's</a>
+        </div>
+      </div>
+
+      <!-- Kids Party -->
+      <div class="event-card">
+        <div class="event-img" style="background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80');"></div>
+        <div class="event-body">
+          <span class="event-tag">Kids</span>
+          <h3>🧸 Kids Party</h3>
+          <p>Bright, colorful, and totally fun — everything to make your little one's party unforgettable.</p>
+          <ul class="event-includes">
+            <li>✓ Colorful Balloons</li>
+            <li>✓ Party Cone Hats</li>
+            <li>✓ Confetti Poppers</li>
+            <li>✓ Fun LED Accessories</li>
+          </ul>
+          <a href="{{ url_for('category', category_id='party-hats') }}" class="btn-primary">Shop Kids Party</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== BULK ORDER CTA ===== -->
+<section class="promo-banner">
+  <div class="container">
+    <h2>🎊 PLANNING A BIG EVENT?</h2>
+    <p>Get special bulk pricing for corporate events, school parties, and large gatherings.</p>
+    <a href="{{ url_for('about') }}" class="btn-primary">Contact Us for Bulk Orders</a>
+  </div>
+</section>
+
+{% endblock %}

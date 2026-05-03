@@ -19,27 +19,31 @@
 
       <div class="filter-group">
         <h4>Price Range</h4>
-        <label><input type="checkbox" checked /> Under ₱50</label>
-        <label><input type="checkbox" checked /> ₱50 – ₱200</label>
-        <label><input type="checkbox" /> ₱200 – ₱500</label>
-        <label><input type="checkbox" /> Over ₱500</label>
+        <label><input type="checkbox" class="price-filter" data-min="0" data-max="50" checked onchange="applyFilters()" /> Under ₱50</label>
+        <label><input type="checkbox" class="price-filter" data-min="50" data-max="200" checked onchange="applyFilters()" /> ₱50 – ₱200</label>
+        <label><input type="checkbox" class="price-filter" data-min="200" data-max="500" onchange="applyFilters()" /> ₱200 – ₱500</label>
+        <label><input type="checkbox" class="price-filter" data-min="500" data-max="99999" onchange="applyFilters()" /> Over ₱500</label>
       </div>
 
       <div class="filter-group">
         <h4>Category</h4>
+        <a href="{{ url_for('index') }}" class="filter-cat-link {% if not current_cat %}active{% endif %}">
+          🛍️ All Products
+        </a>
         {% for cat in categories %}
-        <label>
-          <input type="checkbox" {% if current_cat and cat.id == current_cat.id %}checked{% endif %} />
-          {{ cat.label }}
-        </label>
+        <a href="{{ url_for('category', category_id=cat.id) }}"
+           class="filter-cat-link {% if current_cat and cat.id == current_cat.id %}active{% endif %}">
+          {{ cat.icon }} {{ cat.label }}
+        </a>
         {% endfor %}
       </div>
 
       <div class="filter-group">
-        <h4>Rating</h4>
-        <label><input type="checkbox" /> ★★★★★ (5 Stars)</label>
-        <label><input type="checkbox" checked /> ★★★★☆ (4+ Stars)</label>
-        <label><input type="checkbox" /> ★★★☆☆ (3+ Stars)</label>
+        <h4>Min Rating</h4>
+        <label><input type="radio" name="rating-filter" class="rating-filter" value="5" onchange="applyFilters()" /> ★★★★★ 5 Stars only</label>
+        <label><input type="radio" name="rating-filter" class="rating-filter" value="4" onchange="applyFilters()" checked /> ★★★★☆ 4+ Stars</label>
+        <label><input type="radio" name="rating-filter" class="rating-filter" value="3" onchange="applyFilters()" /> ★★★☆☆ 3+ Stars</label>
+        <label><input type="radio" name="rating-filter" class="rating-filter" value="0" onchange="applyFilters()" /> Show All</label>
       </div>
 
       <div class="filter-group">
@@ -96,11 +100,15 @@
             </div>
             <div class="product-footer">
               <span class="product-price">₱{{ p.price }}</span>
+              {% if session.get('user') %}
               <form action="{{ url_for('add_to_cart', product_id=p.id) }}" method="POST">
                 <input type="hidden" name="quantity" value="1" />
                 <input type="hidden" name="size" value="Medium" />
                 <button type="submit" class="add-to-cart-btn">Add to Cart</button>
               </form>
+              {% else %}
+              <a href="{{ url_for('login') }}" class="add-to-cart-btn guest-cart-btn" title="Log in to add to cart">🔒 Log In</a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -116,4 +124,38 @@
 
   </div>
 </div>
+<script>
+function applyFilters() {
+  const cards = document.querySelectorAll('.product-card');
+  
+  // Get checked price ranges
+  const priceChecks = document.querySelectorAll('.price-filter:checked');
+  const priceRanges = Array.from(priceChecks).map(cb => ({
+    min: parseFloat(cb.dataset.min),
+    max: parseFloat(cb.dataset.max)
+  }));
+
+  // Get selected min rating
+  const ratingEl = document.querySelector('.rating-filter:checked');
+  const minRating = ratingEl ? parseFloat(ratingEl.value) : 0;
+
+  cards.forEach(card => {
+    const price = parseFloat(card.dataset.price || 0);
+    const rating = parseFloat(card.dataset.rating || 0);
+
+    // Price: show if matches any checked range (or no ranges checked = show all)
+    const priceOk = priceRanges.length === 0 || priceRanges.some(r => price >= r.min && price <= r.max);
+    const ratingOk = rating >= minRating;
+
+    card.style.display = (priceOk && ratingOk) ? 'block' : 'none';
+  });
+}
+
+function clearFilters() {
+  document.querySelectorAll('.price-filter').forEach(cb => cb.checked = false);
+  const showAll = document.querySelector('.rating-filter[value="0"]');
+  if (showAll) showAll.checked = true;
+  applyFilters();
+}
+</script>
 {% endblock %}

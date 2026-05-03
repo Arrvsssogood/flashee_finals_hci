@@ -38,18 +38,43 @@
 
       <!-- Right Icons -->
       <div class="nav-icons">
+
         {% if session.get('user') %}
-          <a href="{{ url_for('logout') }}" class="nav-icon-btn" title="Log Out">👤 Logout</a>
+          <!-- Profile Dropdown -->
+          <div class="profile-dropdown" id="profileDropdown">
+            <button class="profile-trigger" onclick="toggleDropdown()">
+              <span class="profile-avatar">{{ user_name[0] | upper if user_name else '?' }}</span>
+              <span class="profile-name">{{ user_name }}</span>
+              <span class="profile-arrow">▾</span>
+            </button>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-menu-header">
+                <span class="profile-menu-avatar">{{ user_name[0] | upper if user_name else '?' }}</span>
+                <div>
+                  <strong>{{ user_name }}</strong>
+                  <small>{{ session.get('user') }}</small>
+                </div>
+              </div>
+              <div class="profile-menu-divider"></div>
+              <a href="{{ url_for('cart') }}" class="profile-menu-item">🛒 My Cart</a>
+              <a href="#" class="profile-menu-item">📦 My Orders</a>
+              <a href="#" class="profile-menu-item">⚙️ Settings</a>
+              <div class="profile-menu-divider"></div>
+              <a href="{{ url_for('logout') }}" class="profile-menu-item logout-item">🚪 Log Out</a>
+            </div>
+          </div>
         {% else %}
-          <a href="{{ url_for('login') }}" class="nav-icon-btn" title="Account">👤 Account</a>
+          <a href="{{ url_for('login') }}" class="nav-icon-btn">👤 Log In</a>
+          <a href="{{ url_for('signup') }}" class="signup-nav-btn">Sign Up</a>
         {% endif %}
+
         <a href="{{ url_for('cart') }}" class="nav-icon-btn cart-btn" title="Cart">
           🛒 Cart
           {% if cart_count > 0 %}
             <span class="cart-badge">{{ cart_count }}</span>
           {% endif %}
         </a>
-        <a href="#" class="bulk-btn">BULK ORDER</a>
+        <a href="{{ url_for('index') }}" class="bulk-btn">BULK ORDER</a>
       </div>
 
     </div>
@@ -57,11 +82,9 @@
     <!-- Nav Links -->
     <nav class="nav-links">
       <a href="{{ url_for('index') }}">SHOP NEW ARRIVALS</a>
-      <a href="#">EVENT COLLECTIONS</a>
-      <a href="#">EVENTS</a>
-      <a href="{{ url_for('index') }}">PRODUCTS</a>
-      <a href="#">ULTIMATE FUN</a>
-      <a href="#">ABOUT US</a>
+      <a href="{{ url_for('events') }}">EVENTS</a>
+      <a href="{{ url_for('ultimate_fun') }}">ULTIMATE FUN</a>
+      <a href="{{ url_for('about') }}">ABOUT US</a>
     </nav>
   </header>
 
@@ -118,7 +141,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2024 Flashee.com — All rights reserved.</p>
+      <p>&copy; 2026 Flashee.com — Group 8 — All rights reserved.</p>
     </div>
   </footer>
 

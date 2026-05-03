@@ -11,7 +11,7 @@
     <p class="hero-sub">Party favors, LED lights & fun accessories — delivered fast.</p>
     <div class="hero-btns">
       <a href="{{ url_for('index') }}" class="btn-primary">SHOP NEW ARRIVALS</a>
-      <a href="#" class="btn-outline">EVENT COLLECTIONS</a>
+      <a href="{{ url_for('events') }}" class="btn-outline">EVENT COLLECTIONS</a>
     </div>
   </div>
 </section>
@@ -71,11 +71,15 @@
           </div>
           <div class="product-footer">
             <span class="product-price">₱{{ p.price }}</span>
+            {% if session.get('user') %}
             <form action="{{ url_for('add_to_cart', product_id=p.id) }}" method="POST">
               <input type="hidden" name="quantity" value="1" />
               <input type="hidden" name="size" value="Medium" />
               <button type="submit" class="add-to-cart-btn">Add to Cart</button>
             </form>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="add-to-cart-btn guest-cart-btn" title="Log in to add to cart">🔒 Log In</a>
+            {% endif %}
           </div>
         </div>
       </div>

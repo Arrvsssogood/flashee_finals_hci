@@ -49,3 +49,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 4000);
   });
 });
+
+// -------- Profile Dropdown Toggle --------
+function toggleDropdown() {
+  const dropdown = document.getElementById("profileDropdown");
+  if (dropdown) dropdown.classList.toggle("open");
+}
+
+// Close dropdown when clicking outside
+document.addEventListener("click", function (e) {
+  const dropdown = document.getElementById("profileDropdown");
+  if (dropdown && !dropdown.contains(e.target)) {
+    dropdown.classList.remove("open");
+  }
+});
