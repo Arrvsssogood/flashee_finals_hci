@@ -7,9 +7,15 @@ services:
     build: .
     container_name: flashee_app
     ports:
-      - "5000:5000"   # Access the site at http://localhost:5000
+      - "5000:5000"
+
+    env_file:
+      - ./.env
+
     environment:
       - FLASK_ENV=development
+
     volumes:
-      - .:/app        # Mount source for live edits (optional for dev)
+      - .:/app
+
     restart: unless-stopped
