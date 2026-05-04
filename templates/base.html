@@ -57,7 +57,7 @@
               </div>
               <div class="profile-menu-divider"></div>
               <a href="{{ url_for('cart') }}" class="profile-menu-item">🛒 My Cart</a>
-              <a href="#" class="profile-menu-item">📦 My Orders</a>
+              <a href="{{ url_for('orders') }}" class="profile-menu-item">📦 My Orders</a>
               <a href="#" class="profile-menu-item">⚙️ Settings</a>
               <div class="profile-menu-divider"></div>
               <a href="{{ url_for('logout') }}" class="profile-menu-item logout-item">🚪 Log Out</a>
