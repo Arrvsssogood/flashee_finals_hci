@@ -4,10 +4,11 @@
 from flask import Flask, render_template, redirect, url_for, session, request, flash
 from products import PRODUCTS, CATEGORIES, get_product_by_id, get_products_by_category
 from datetime import datetime
-
+import os
+ 
 app = Flask(__name__)
 # Secret key needed for Flask sessions (cart storage)
-app.secret_key = "flashee-secret-2024"
+app.secret_key = os.environ.get("SECRET_KEY")
 
 
 # ---------------------------------------------------------------------------
