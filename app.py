@@ -230,9 +230,17 @@ def logout():
 
 @app.route("/search")
 def search():
-    """Basic search by product name (case-insensitive)."""
-    query = request.args.get("q", "").lower()
-    results = [p for p in PRODUCTS if query in p["name"].lower()] if query else []
+    """Search by name, description, and category — partial match supported."""
+    query = request.args.get("q", "").lower().strip()
+    if query:
+        results = [
+            p for p in PRODUCTS
+            if query in p["name"].lower()
+            or query in p["description"].lower()
+            or query in p["category_label"].lower()
+        ]
+    else:
+        results = []
     return render_template("index.html", products=results, categories=CATEGORIES, search_query=query)
 
 
