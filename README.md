@@ -1,7 +1,7 @@
 # Flashee.com
 
 A redesign of Blinkee.com — a simplified e-commerce site for LED party products and party favors.  
-Built with Flask (Python) as a school project.
+Built with Flask (Python) as a **final project** for the course **Human Computer Interaction (CS 3215)**.
 
 ---
 
