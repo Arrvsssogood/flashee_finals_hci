@@ -7,14 +7,58 @@
     <div class="checkout-icon">🎉</div>
     <h1>Thank You for Your Order!</h1>
     <p class="checkout-msg">
-      Your order has been placed successfully. We'll prepare your party supplies
-      and get them to you as fast as possible!
+      Your party supplies are on their way! We'll get it to you as fast as possible.
     </p>
+
+    {% if order %}
+    <div class="checkout-order-summary">
+      <div class="checkout-order-header">
+        <span class="checkout-order-id">Order #{{ order.id }}</span>
+        <span class="checkout-order-date">{{ order.date }}</span>
+      </div>
+      <div class="checkout-items">
+        {% for item in order['items'] %}
+        <div class="checkout-item">
+          <img src="{{ item.image }}" alt="{{ item.name }}" class="checkout-item-img" />
+          <div class="checkout-item-info">
+            <span class="checkout-item-name">{{ item.name }}</span>
+            <span class="checkout-item-meta">Size: {{ item.size }} | Qty: {{ item.quantity }}</span>
+          </div>
+          <span class="checkout-item-price">₱{{ item.price * item.quantity }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="checkout-totals">
+        <div class="checkout-total-row">
+          <span>Subtotal</span><span>₱{{ order.subtotal }}</span>
+        </div>
+        <div class="checkout-total-row">
+          <span>Shipping</span>
+          <span>{% if order.shipping == 0 %}FREE 🎉{% else %}₱{{ order.shipping }}{% endif %}</span>
+        </div>
+        <div class="checkout-total-row grand-total">
+          <span>Total Paid</span><span>₱{{ order.total }}</span>
+        </div>
+      </div>
+    </div>
+
     <div class="checkout-details">
       <p>📦 Estimated delivery: <strong>3–5 business days</strong></p>
       <p>📧 A confirmation will be sent to your email.</p>
     </div>
+
+    <div class="checkout-actions">
+      <a href="{{ url_for('orders') }}" class="btn-primary">📋 View My Orders</a>
+      <a href="{{ url_for('index') }}" class="btn-outline-dark">Continue Shopping</a>
+    </div>
+
+    {% else %}
+    <div class="checkout-details">
+      <p>📦 Estimated delivery: <strong>3–5 business days</strong></p>
+    </div>
     <a href="{{ url_for('index') }}" class="btn-primary">Continue Shopping</a>
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}

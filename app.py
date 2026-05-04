@@ -3,6 +3,7 @@
 
 from flask import Flask, render_template, redirect, url_for, session, request, flash
 from products import PRODUCTS, CATEGORIES, get_product_by_id, get_products_by_category
+from datetime import datetime
 
 app = Flask(__name__)
 # Secret key needed for Flask sessions (cart storage)
@@ -152,9 +153,41 @@ def cart():
 
 @app.route("/checkout", methods=["POST"])
 def checkout():
-    """Process checkout — clear cart and show thank-you page."""
+    """Process checkout — save order to history, clear cart."""
+    cart = get_cart()
+    if not cart:
+        return redirect(url_for("cart"))
+
+    total = cart_total()
+    shipping = 0 if total >= 999 else 99
+    order = {
+        "id": f"FLH-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+        "date": datetime.now().strftime("%B %d, %Y at %I:%M %p"),
+        "items": [dict(item) for item in cart.values()],
+        "subtotal": total,
+        "shipping": shipping,
+        "total": total + shipping,
+        "status": "Order Placed"
+    }
+
+    if "order_history" not in session:
+        session["order_history"] = []
+    orders = session["order_history"]
+    orders.append(order)
+    session["order_history"] = orders
+
     session["cart"] = {}
-    return render_template("checkout.html")
+    return render_template("checkout.html", order=order)
+
+
+@app.route("/orders")
+def orders():
+    """My Orders page — shows all past orders from session."""
+    if not session.get("user"):
+        flash("Please log in to view your orders. 🔒", "error")
+        return redirect(url_for("login"))
+    order_history = list(reversed(session.get("order_history", [])))
+    return render_template("orders.html", orders=order_history)
 
 
 @app.route("/login", methods=["GET", "POST"])

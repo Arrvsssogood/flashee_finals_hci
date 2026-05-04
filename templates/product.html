@@ -71,7 +71,13 @@
           </div>
         </div>
 
+        {% if session.get('user') %}
         <button type="submit" class="btn-primary full-width">🛒 Add to Cart</button>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="btn-primary full-width" style="text-align:center;">
+          🔒 Log In to Add to Cart
+        </a>
+        {% endif %}
       </form>
 
       <!-- Info Pills -->

@@ -6,11 +6,7 @@
   <h1 class="page-title">🛒 Your Cart</h1>
 
   {% if cart %}
-
-  <!-- ===== CART WITH ITEMS ===== -->
   <div class="cart-layout">
-
-    <!-- Cart Items List -->
     <div class="cart-items">
       {% for key, item in cart.items() %}
       <div class="cart-item">
@@ -24,124 +20,84 @@
           <form action="{{ url_for('update_cart', product_id=item.id) }}" method="POST" class="qty-form">
             <div class="qty-control small">
               <button type="button" class="qty-btn" onclick="adjustQty(this, -1)">−</button>
-              <input type="number" name="quantity" value="{{ item.quantity }}"
-                min="1" max="99" class="qty-input"
-                onchange="this.form.submit()" />
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99" class="qty-input" onchange="this.form.submit()" />
               <button type="button" class="qty-btn" onclick="adjustQty(this, 1)">+</button>
             </div>
           </form>
           <span class="cart-item-total">₱{{ item.price * item.quantity }}</span>
-          <a href="{{ url_for('remove_from_cart', product_id=item.id) }}"
-             class="remove-btn"
-             onclick="return confirm('Remove {{ item.name }} from cart?')">✕</a>
+          <!-- Custom Removal Modal Trigger -->
+          <a href="javascript:void(0)" class="remove-btn" onclick="openCancelModal('{{ url_for('remove_from_cart', product_id=item.id) }}', '{{ item.name }}')">✕</a>
         </div>
       </div>
       {% endfor %}
     </div>
 
-    <!-- Order Summary -->
     <div class="cart-summary">
       <h2>Order Summary</h2>
-      <div class="summary-row">
-        <span>Subtotal</span>
-        <span>₱{{ total }}</span>
-      </div>
-      <div class="summary-row">
-        <span>Shipping</span>
-        <span>{% if total >= 999 %}FREE 🎉{% else %}₱99{% endif %}</span>
-      </div>
+      <div class="summary-row"><span>Subtotal</span><span>₱{{ total }}</span></div>
+      <div class="summary-row"><span>Shipping</span><span>{% if total >= 999 %}FREE 🎉{% else %}₱99{% endif %}</span></div>
       <div class="summary-divider"></div>
-      <div class="summary-row total-row">
-        <span>Total</span>
-        <span>₱{{ total + (0 if total >= 999 else 99) }}</span>
-      </div>
-      {% if total < 999 %}
-        <p class="free-ship-hint">Add ₱{{ 999 - total }} more for FREE shipping!</p>
-      {% endif %}
+      <div class="summary-row total-row"><span>Total</span><span>₱{{ total + (0 if total >= 999 else 99) }}</span></div>
 
-      <!-- Checkout Button — triggers custom modal -->
-      <button type="button" class="btn-primary full-width checkout-btn" onclick="openCheckoutModal()">
-        ✅ Proceed to Checkout
-      </button>
-      <!-- Hidden form submitted only when user confirms -->
+      <button type="button" class="btn-primary full-width checkout-btn" onclick="openCheckoutModal()">✅ Proceed to Checkout</button>
       <form id="checkout-form" action="{{ url_for('checkout') }}" method="POST"></form>
-
       <a href="{{ url_for('index') }}" class="continue-shopping">← Continue Shopping</a>
     </div>
-
   </div>
 
-  <!-- ===== CUSTOM CHECKOUT MODAL ===== -->
-  <div id="checkout-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:20px; padding:2rem; max-width:420px; width:90%; text-align:center; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
-
-      <!-- Back / close button -->
-      <div style="display:flex; justify-content:flex-start; margin-bottom:1rem;">
-        <button onclick="closeCheckoutModal()" style="background:#6c3fc5; border:none; border-radius:10px; width:40px; height:40px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+  <!-- CHECKOUT MODAL -->
+  <div id="checkout-modal" class="custom-modal-overlay">
+    <div class="custom-modal-content">
+      <div class="modal-back-wrapper">
+        <button onclick="closeCheckoutModal()" class="modal-back-icon-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
       </div>
 
-      <h2 style="font-size:1.2rem; font-weight:700; margin-bottom:0.4rem; color:#1a1a2e;">Are you sure you want to purchase this item?</h2>
+      <h2 class="modal-main-title">Are you sure you want to purchase this item?</h2>
 
-      <!-- Order items list -->
-      <div style="text-align:left; background:#f7f7fb; border-radius:12px; padding:1rem; margin:1rem 0; max-height:200px; overflow-y:auto;">
-        <p style="font-size:0.75rem; font-weight:600; color:#888; text-transform:uppercase; margin:0 0 0.5rem;">Your order</p>
+      <div class="modal-order-list">
+        <p class="modal-list-label">Your order</p>
         {% for key, item in cart.items() %}
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:0.4rem 0; border-bottom:1px solid #ebebeb;">
+        <div class="modal-list-item">
           <div>
-            <p style="margin:0; font-size:0.9rem; font-weight:600; color:#1a1a2e;">{{ item.name }}</p>
-            <p style="margin:0; font-size:0.78rem; color:#888;">Size: {{ item.size }} &nbsp;·&nbsp; Qty: {{ item.quantity }}</p>
+            <p class="modal-item-name">{{ item.name }}</p>
+            <p class="modal-item-sub">Size: {{ item.size }} &nbsp;·&nbsp; Qty: {{ item.quantity }}</p>
           </div>
-          <span style="font-size:0.9rem; font-weight:700; color:#6c3fc5;">₱{{ item.price * item.quantity }}</span>
+          <span class="modal-item-price">₱{{ item.price * item.quantity }}</span>
         </div>
         {% endfor %}
-        <div style="display:flex; justify-content:space-between; margin-top:0.6rem;">
-          <span style="font-size:0.85rem; font-weight:600; color:#1a1a2e;">Total</span>
-          <span style="font-size:0.95rem; font-weight:700; color:#1a1a2e;">₱{{ total + (0 if total >= 999 else 99) }}</span>
+        <div class="modal-total-row">
+          <span>Total</span>
+          <span>₱{{ total + (0 if total >= 999 else 99) }}</span>
         </div>
       </div>
 
-      <!-- Action buttons -->
-      <div style="display:flex; gap:1rem; margin-top:0.5rem;">
-        <button onclick="closeCheckoutModal()"
-          style="flex:1; padding:0.8rem; border-radius:50px; background:#e53935; color:#fff; font-weight:700; font-size:1rem; border:none; cursor:pointer;">
-          Cancel
-        </button>
-        <button onclick="document.getElementById('checkout-form').submit()"
-          style="flex:1; padding:0.8rem; border-radius:50px; background:#43a047; color:#fff; font-weight:700; font-size:1rem; border:none; cursor:pointer;">
-          Confirm
-        </button>
+      <div class="modal-action-btns">
+        <button onclick="closeCheckoutModal()" class="btn-modal-red">Cancel</button>
+        <button onclick="document.getElementById('checkout-form').submit()" class="btn-modal-green">Confirm</button>
       </div>
+    </div>
+  </div>
 
+  <!-- REMOVE ITEM MODAL -->
+  <div id="cancel-modal" class="custom-modal-overlay">
+    <div class="custom-modal-content">
+      <h2 class="modal-main-title">Remove from Cart?</h2>
+      <p id="remove-item-text" style="margin: 1rem 0; color: #888; font-size: 0.9rem;"></p>
+      <div class="modal-action-btns">
+        <button onclick="closeCancelModal()" class="btn-modal-red">No, Stay</button>
+        <a id="confirm-remove-link" href="" class="btn-modal-green" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">Yes, Remove</a>
+      </div>
     </div>
   </div>
 
   {% else %}
-
-  <!-- ===== EMPTY CART STATE ===== -->
   <div class="empty-cart">
     <div class="empty-cart-icon">🛒</div>
     <h2>Your cart is empty.</h2>
-    <p>Looks like you haven't added anything yet. Let's fix that!</p>
     <a href="{{ url_for('index') }}" class="btn-primary">Shop Now</a>
   </div>
-
   {% endif %}
 </div>
-
-<script>
-  function openCheckoutModal() {
-    const modal = document.getElementById('checkout-modal');
-    modal.style.display = 'flex';
-  }
-  function closeCheckoutModal() {
-    const modal = document.getElementById('checkout-modal');
-    modal.style.display = 'none';
-  }
-  // Close modal if user clicks the dark overlay
-  document.getElementById('checkout-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeCheckoutModal();
-  });
-</script>
 {% endblock %}
